@@ -2,88 +2,127 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Typeahead</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Typeahead</title>
 </head>
 
 <body>
-    <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Courier New', Courier, monospace
-        }
+	<style>
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: 'Courier New', Courier, monospace
+		}
 
-        .input-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 200px;
-            position: relative
-        }
+		#hide {
+			display: none;
+		}
 
-        .container {
-            width: 100vw;
-            display: flex;
-            justify-content: space-evenly;
-            flex-direction: column;
-            align-items: center;
-        }
+		.input-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			width: 200px;
+			position: relative
+		}
 
-        #list {
-            list-style: none;
-            margin: 4px auto 10px auto;
-            position: absolute;
-            top: 25px;
-            left: 15%;
-            padding: 4px;
-            background-color: #fff;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-        }
+		.container {
+			width: 100vw;
+			display: flex;
+			justify-content: space-evenly;
+			flex-direction: column;
+			align-items: center;
+		}
 
-        li:hover {
-            background: darkslategray;
-            color: white;
-            cursor: pointer;
-            transition: all .5s;
-        }
+		#list {
+			list-style: none;
+			margin: 4px auto 10px auto;
+			position: absolute;
+			top: 25px;
+			left: 15%;
+			padding: 4px;
+			background-color: #fff;
+			border: 1px solid rgba(0, 0, 0, 0.2);
+			border-radius: 4px;
+			box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+		}
 
-        .selected-container {
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-        }
+		li:hover {
+			background: darkslategray;
+			color: white;
+			cursor: pointer;
+			transition: all .5s;
+		}
 
-        .card-container {
-            height: 250px;
-            width: 200px;
-            border: 1px solid black;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-            margin: 10px;
-        }
-    </style>
+		.selected-container {
+			width: 100%;
+			display: flex;
+			flex-wrap: wrap;
+		}
 
-    <div class="container">
-        <h1>Try Typing...</h1>
-        <div class="input-container">
-            <input type="text">
-            <ul id="list"></ul>
-        </div>
-    </div>
+		.card-container {
+			height: 250px;
+			width: 200px;
+			border: 1px solid black;
+			border-radius: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			text-align: center;
+			margin: 10px;
+		}
+	</style>
+
+	<div class="container">
+		<h1>Try Typing...</h1>
+		<div class="input-container">
+			<input type="text">
+			<ul id="hide"></ul>
+		</div>
+	</div>
 
 </body>
 
 <script>
+	let characters = []
+	const list = document.getElementById('hide')
+	const search = document.querySelector('input');
+
+	fetch('https://swapi.co/api/people')
+	.then(response=> response.json())
+	.then(response=>{
+		characters = response.results
+		render()
+	})
+
+	const render = (arr) => {
+		let html
+		if(arr){
+			html = arr.map(char=>`<li>${char.name}<li>`).join('')
+		}
+		else {
+			html = ''
+		}
+		list.innerHTML = html
+	}
+
+	function filterText(e){
+		const filtered = characters.filter(char=>char.name.toLowerCase().includes(this.value.toLowerCase()))
+		if(filtered.length>0&&this.value){
+			list.id="list"
+			render(filtered)
+		}
+		else{
+			list.id = 'hide'
+		}
+	}
+
+	search.addEventListener('keyup', filterText)
+
 </script>
 
 </html>
